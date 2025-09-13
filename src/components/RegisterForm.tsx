@@ -1,134 +1,149 @@
 import { useState } from 'react';
 
+// Esta función es un "helper" para navegar a otra página.
+// En Astro, las redirecciones se manejan mejor a nivel de página o con JS nativo.
+const navigate = (path: string) => {
+  window.location.href = path;
+};
+
 export default function RegisterForm() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // Estados para cada campo del formulario
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [mail, setMail] = useState('');
+  const [contrasenia, setContrasenia] = useState('');
+  const [confirmarContrasenia, setConfirmarContrasenia] = useState('');
+  
+  // Estados para manejar la comunicación con la API
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
-    
+    setSuccess('');
     setIsLoading(true);
 
-    // --- Lógica de Conexión con el Backend (a implementar) ---
-    // Simulamos una llamada para registrar al usuario.
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // --- Validación de Contraseñas ---
+    if (contrasenia !== confirmarContrasenia) {
+      setError('Las contraseñas no coinciden.');
+      setIsLoading(false);
+      return;
+    }
 
-    // Simulación de éxito
-    alert(`¡Registro exitoso para ${name}! Ahora serás redirigido para iniciar sesión.`);
-    window.location.href = '/login';
+    // --- Conexión con el Backend ---
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre,
+          apellido,
+          mail,
+          contrasenia,
+        }),
+      });
 
-    setIsLoading(false);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Si el servidor devuelve un error (ej: 409 - Conflicto)
+        throw new Error(data.error || 'Ocurrió un error al registrar.');
+      }
+      
+      // Si todo sale bien
+      setSuccess('¡Registro exitoso! Serás redirigido para iniciar sesión.');
+      setTimeout(() => {
+        navigate('/login'); // Redirigir al login después de 2 segundos
+      }, 2000);
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-      <h2 className="text-3xl font-bold text-center text-slate-900 mb-6">Crear Cuenta</h2>
+      <h2 className="text-3xl font-bold text-center text-slate-800 mb-6">
+        Crear una Cuenta
+      </h2>
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
-          <span className="block sm:inline">{error}</span>
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" role="alert">
+          <p>{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md" role="alert">
+          <p>{success}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-            Nombre Completo
-          </label>
+      <form onSubmit={handleSubmit} noValidate>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="nombre" className="block text-slate-700 text-sm font-bold mb-2">Nombre</label>
+            <input
+              type="text" id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)}
+              className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="apellido" className="block text-slate-700 text-sm font-bold mb-2">Apellido</label>
+            <input
+              type="text" id="apellido" value={apellido} onChange={(e) => setApellido(e.target.value)}
+              className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="mail" className="block text-slate-700 text-sm font-bold mb-2">Correo Electrónico</label>
           <input
-            id="name"
-            type="text"
+            type="email" id="mail" value={mail} onChange={(e) => setMail(e.target.value)}
+            className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Juan Pérez"
           />
         </div>
-        <div>
-          <label htmlFor="email-register" className="block text-sm font-medium text-slate-700">
-            Correo Electrónico
-          </label>
+        <div className="mb-4">
+          <label htmlFor="contrasenia" className="block text-slate-700 text-sm font-bold mb-2">Contraseña</label>
           <input
-            id="email-register"
-            type="email"
+            type="password" id="contrasenia" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)}
+            className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="tu@email.com"
           />
         </div>
-        <div>
-          <label htmlFor="password-register" className="block text-sm font-medium text-slate-700">
-            Contraseña
-          </label>
+        <div className="mb-6">
+          <label htmlFor="confirmarContrasenia" className="block text-slate-700 text-sm font-bold mb-2">Confirmar Contraseña</label>
           <input
-            id="password-register"
-            type="password"
+            type="password" id="confirmarContrasenia" value={confirmarContrasenia} onChange={(e) => setConfirmarContrasenia(e.target.value)}
+            className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Mínimo 6 caracteres"
           />
         </div>
-         <div>
-          <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-700">
-            Confirmar Contraseña
-          </label>
-          <input
-            id="confirm-password"
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Repite tu contraseña"
-          />
-        </div>
-        <div className="pt-2">
+        <div className="flex flex-col items-center justify-center gap-4">
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-slate-400 transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition-transform hover:scale-105 disabled:bg-slate-400 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Creando cuenta...' : 'Registrarme'}
+            {isLoading ? 'Registrando...' : 'Crear Cuenta'}
           </button>
-        </div>
-      </form>
-      
-      {/* Separador y botón de acción para iniciar sesión */}
-      <div className="mt-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-300" />
+          <div className="w-full flex items-center justify-center">
+             <div className="flex-grow border-t border-slate-300"></div>
+             <span className="flex-shrink mx-4 text-slate-500">o</span>
+             <div className="flex-grow border-t border-slate-300"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-slate-500">¿Ya tienes una cuenta?</span>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <a
-            href="/login"
-            className="w-full flex items-center justify-center px-8 py-3 border border-slate-300 rounded-full shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors"
-          >
-            Inicia Sesión
+          <a href="/login" className="w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition-transform hover:scale-105">
+            Ya tengo una cuenta
           </a>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

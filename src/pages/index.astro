@@ -1,16 +1,49 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="PCFIX - Inicio">
+  <section class="text-center">
+    <h1 class="text-5xl font-extrabold text-slate-900 mb-4">
+      Bienvenido a <span class="text-blue-600">PCFIX</span>
+    </h1>
+    <p class="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
+      La solución definitiva para tus necesidades de computación. Componentes de alta gama, ensambles a medida y el mejor servicio técnico.
+    </p>
+    
+    <!-- Contenedor para los botones de acción -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a 
+        href="/login" 
+        class="inline-block w-full sm:w-auto bg-blue-600 text-white font-bold text-lg px-8 py-3 rounded-full hover:bg-blue-700 transition-transform hover:scale-105 shadow-lg"
+      >
+        Iniciar Sesión
+      </a>
+      <a 
+        href="/register" 
+        class="inline-block w-full sm:w-auto bg-white text-blue-600 border-2 border-blue-600 font-bold text-lg px-8 py-3 rounded-full hover:bg-blue-50 transition-transform hover:scale-105 shadow-lg"
+      >
+        Registrarse
+      </a>
+    </div>
+  </section>
+
+  <section class="mt-20">
+      <h2 class="text-3xl font-bold text-center text-slate-800 mb-10">Categorías Destacadas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Placeholder para tarjetas de categorías -->
+        <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
+            <h3 class="text-xl font-semibold mb-2">Procesadores</h3>
+            <p class="text-slate-500">Potencia para tus tareas.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
+            <h3 class="text-xl font-semibold mb-2">Tarjetas Gráficas</h3>
+            <p class="text-slate-500">Gráficos de última generación.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
+            <h3 class="text-xl font-semibold mb-2">Periféricos</h3>
+            <p class="text-slate-500">Mejora tu setup.</p>
+        </div>
+      </div>
+  </section>
+</Layout>

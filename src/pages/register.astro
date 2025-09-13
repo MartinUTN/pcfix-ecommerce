@@ -1,0 +1,9 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RegisterForm from '../components/RegisterForm.tsx';
+---
+<Layout title="PCFIX - Crear Cuenta">
+  <div class="flex justify-center items-center">
+    <RegisterForm client:load />
+  </div>
+</Layout>

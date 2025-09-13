@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LoginForm from '../components/LoginForm.tsx';
+---
+<Layout title="PCFIX - Iniciar Sesión">
+  <div class="flex justify-center items-center">
+    <!-- 
+      La directiva `client:load` es la magia de Astro. 
+      Le dice a Astro que este componente de React debe ser interactivo 
+      y cargado inmediatamente en el navegador del cliente.
+    -->
+    <LoginForm client:load />
+  </div>
+</Layout>
